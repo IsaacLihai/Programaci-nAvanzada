@@ -1,0 +1,21 @@
+#Creación de exception al ingresar una clave que no sea de cuatro dígitos
+
+class Error(Exception):
+    pass
+
+class Claveincorrecta(Error):
+    pass
+
+
+
+while True:
+    try:
+        a=input("Ingrese una clave de cuatro dígitos:  " )
+        if len(a)!=4:
+            raise Claveincorrecta
+        break
+
+    except Claveincorrecta:
+        print("Su clave no tiene cuatro dígitos \n ")
+
+print("¡Se agrego su clave!")
