@@ -1,0 +1,187 @@
+class Group:
+    def __init__(self, regla):
+        self.regla = regla
+
+    def ListaElementos(self):
+        listaclaves = self.regla.keys()
+        listaelementos = []
+        aux1 = []
+        for i in listaclaves:
+            for j in i:
+                aux1.append(j)
+        listasemielementos = list(set(aux1))
+
+        for i in listasemielementos:
+            listaelementos.append(Elemento(i, self.regla))
+
+        return listaelementos
+
+    def cerradura(self):
+        cerrado = True
+        for i in Group.ListaElementos(self):
+            for j in Group.ListaElementos(self):
+                if i + j in Group.ListaElementos(self):
+                    break
+                else:
+                    cerrado = False
+        return cerrado
+
+    def asociatividad(self):
+
+        asociativo = True
+        for i in Group.ListaElementos(self):
+            for j in Group.ListaElementos(self):
+                for k in Group.ListaElementos(self):
+                    if (i+j)+k == i+(j+k):
+                        asociativo = True
+                    else:
+                        asociativo = False
+                        break
+                if not asociativo:
+                    break
+            if not asociativo:
+                break
+        return asociativo
+
+    def ExistenciaIdentidad(self):
+        m = False
+        for i in Group.ListaElementos(self):
+            if not m:
+                for j in Group.ListaElementos(self):
+                    if i + j == j and j + i == j:
+                        # a = i
+                        m = True
+                    else:
+                        # a = "No tiene elemento identidad el grupo"
+                        m = False
+                        break
+            else:
+                break
+        return m
+
+    def ElementoIdentidad(self):
+        a = ""
+        m = False
+        for i in Group.ListaElementos(self):
+            if not m:
+                 for j in Group.ListaElementos(self):
+                    if i + j == j and j + i == j:
+                        a = i
+                        m = True
+                    else:
+                        a = "No tiene elemento identidad el grupo"
+                        m = False
+                        break
+            else:
+                break
+
+        return a
+
+    def ExistenciaInversos(self):
+        m = True
+        if Group.ElementoIdentidad(self) in Group.ListaElementos(self):
+            for i in Group.ListaElementos(self):
+                for j in Group.ListaElementos(self):
+                    if i+j == Group.ElementoIdentidad(self):
+                        m = True
+                        break
+                    else:
+                        m = False
+
+        return m
+
+class Elemento:
+    def __init__(self, x, regla):
+        self.x=x
+        self.regla = regla
+
+    def __str__(self):
+        return " '{0}' ".format(self.x)
+
+    def __add__(self, other):
+        return Elemento(self.regla[self.x, other.x], self.regla)
+
+    def __eq__(self, other):
+        if self.x == other.x:
+            return True
+        else:
+            return False
+
+    def Elementoinverso(self):
+
+        if Group.ExistenciaInversos(self):
+            for j in Group.ListaElementos(self):
+                if Elemento(self.x, self.regla)+j == Group.ElementoIdentidad(self):
+                    inverso = j
+                    break
+        return inverso
+
+    def __sub__(self, other):
+        return Elemento(self.x, self.regla) + Elemento(other.x, self.regla).Elementoinverso()
+
+    def Oden(self):
+        a=1
+        b=Elemento(self.x, self.regla)
+        while b != Group.ElementoIdentidad(self):
+            b = b + Elemento(self.x, self.regla)
+            a += 1
+
+        return a
+
+
+
+
+
+
+
+
+
+
+g=Group({("0","0"): "0", ("0","1") : "1", ("1","0"): "1" , ("1","1") : "2", ("0","2"): "2" , ("2","0") : "2" , ("2","1"): "0", ("1","2"): "0", ("2","2"): "1"})
+#g=Group({('0','0'):'0',('0','1'):'1',('0','2'):'2',('0','3'):'3',('0','4'):'4',('0','5'):'5',('1','0'):'1',('1','1'):'2',('1','2'):'3',('1','3'):'4',('1','4'):'5',('1','5'):'0',('2','0'):'2',('2','1'):'3',('2','2'):'4',('2','3'):'5',('2','4'):'0',('2','5'):'1',('3','0'):'3',('3','1'):'4',('3','2'):'5',('3','3'):'0',('3','4'):'1',('3','5'):'2',('4','0'):'4',('4','1'):'5',('4','2'):'0',('4','3'):'1',('4','4'):'2',('4','5'):'3',('5','0'):'5',('5','1'):'0',('5','2'):'1',('5','3'):'2',('5','4'):'3',('5','5'):'4'})
+
+
+#print(g.ListaElementos())
+v = False
+
+if g.cerradura():
+    print("Su estructura es cerrada...")
+
+    if g.asociatividad():
+        print("Su estructura es asociativa...")
+        if g.ExistenciaIdentidad():
+            print("Su estructura tiene elemento identidad...")
+            print("El elemento identidad es: ",g.ElementoIdentidad())
+
+            if g.ExistenciaInversos():
+                print("Los elementos del grupo tienen inversos")
+                print("Finalmente tiene estructura de grupo")
+                v=True
+            else:
+                print("No todos los elementos tienen inverso")
+
+
+
+        else:
+            print("Su estructura no tiene elemento identidad...")
+
+
+    else:
+        print("Su estructura no es asociativa...")
+
+else:
+    print("Su estructreuctura algebraica no es cerrada...")
+
+
+
+if v:
+    x=Elemento("2",g.regla)
+    y=Elemento("1",g.regla)
+    z=Elemento("0", g.regla)
+    print(x+y)
+    print(x-y)
+    print(y-x)
+    print("Orden de '2': ", x.Oden())
+    print("Orden de '1': ", y.Oden())
+    print("Orden de '0': ", z.Oden())
+    print("")
